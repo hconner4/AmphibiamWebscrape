@@ -13,6 +13,8 @@ import datetime
 # creating the date object of today's date
 name = f'data_{datetime.datetime.now().strftime("%H%M_%m%d%Y")}.csv'
 
+#errors to log where scrape failed
+errors = []
 # Create a new instance of the Firefox sdriver
 os.chdir(r'/Users/hconner/')
 driver = webdriver.Chrome()
@@ -36,113 +38,47 @@ numOfPages = re.findall(r'\d{1,5}', numOfPages) #re.findall(r'of',numOfPages)
 numOfP = int(numOfPages[1])
 #number of pages needed to loop through for all the links
 #numOfP = int(numOfLinks/int(numOfPages[1]))
-data = pd.DataFrame(columns=['Info' ,'About1', 'About2'])
+data = pd.DataFrame(columns=['AnimalType1', 'AnimalType2','Info' ,'About1', 'About2'])
 
-#Make a function to click on the image 
-#click on page
+# Get relevant data gets all the data on the webpage for a particular amphibian
+
 def getRelevantData():
-
+    animal_type1 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[3]/div/div[1]/div[1]/h1').text
+    animal_type2 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[1]/div[2]/div/div[1]').text
     animal_info = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[3]/div').text
     animal_about1 = driver.find_element(By.XPATH,'//*[@id="snake-page"]/div/div/div/div[2]/div[1]').text
     animal_about2 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div[3]/div[1]').text
-    return([animal_info, animal_about1, animal_about2])
-
-
-def loopThroughPages():
-    #links = driver.find_elements(By.XPATH,"//a[@href]")
-    #driver.find_elements(By.CLASS_NAME, 'picture')
-    driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[1]/div[1]/picture/img').click()
-    #driver.find_element(By.CSS_SELECTOR,('#root > div.PD8nHTdml1ZBT90vCA6l > div.F8dpc6zxp2_Y4GgkBu1K.mainWrapper > div > div.JnHtrfiYyDbC27y8oB8a > div.sAtvmyDfu3pfgUuvn0ww > div > div.qeswiUQAiXWDYjomZK4l.ecDwgWn62vauKo40KZy4 > a:nth-child(1) > div.zw6z68zM9Btssb5Hgh6l > picture > img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #second link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[2]/div[1]/picture/img')).click()
-    #get page info
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #third link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[3]/div[1]/picture/img')).click()
-    #get page info
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #fourth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[4]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #fifth link                    //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[4]/div[1]/picture/img
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[5]/div[1]/picture/img')).click()
-    #get page info
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #sixth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[6]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #seventh link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[7]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #eighth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[8]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #ninth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[9]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #tenth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[10]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #eleventh link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[11]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #twelvth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[12]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #thirteenth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[13]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #fourteenth link               //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[14]/div[1]/picture/img
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[14]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #fifteenth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[15]/div[1]/picture/img')).click()
-    #get page info
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #sixteenth link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[16]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #17 link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[17]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #18 link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[18]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #19 link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[19]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-    #20 link
-    driver.find_element(By.XPATH,('//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[20]/div[1]/picture/img')).click()
-    data.loc[len(data)] = getRelevantData()
-    driver.back()
-
-    driver.find_element(By.CSS_SELECTOR, '#root > div.PD8nHTdml1ZBT90vCA6l > div.F8dpc6zxp2_Y4GgkBu1K.mainWrapper > div > div.JnHtrfiYyDbC27y8oB8a > div.sAtvmyDfu3pfgUuvn0ww > div > div.Ac9cgD8VuNGFRxtfonUP.seB8J1vqvLrPSoVxmSFe > div > div > a:nth-child(4) > div > svg').click()
-    #Write to google drive as csv
-
-    return data
+    return([animal_type1, animal_type2, animal_info, animal_about1, animal_about2])
 
 for page in range(0,numOfP):
-    loopThroughPages()
+    for i in range(1, 25):
+                # //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[2]/div[1]/picture/img
+        xpath = '//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[{}]/div[1]/picture/img'.format(i)
+        try:
+            driver.find_element(By.XPATH, xpath).click()
+            try:
+                data.loc[len(data)] = getRelevantData()
+                driver.back()
+            except Exception as e:
+                errors.append(i)
+                driver.back()
+        except Exception as e:
+            errors.append(e)
+    driver.find_element(By.CSS_SELECTOR, '#root > div.PD8nHTdml1ZBT90vCA6l > div.F8dpc6zxp2_Y4GgkBu1K.mainWrapper > div > div.JnHtrfiYyDbC27y8oB8a > div.sAtvmyDfu3pfgUuvn0ww > div > div.Ac9cgD8VuNGFRxtfonUP.seB8J1vqvLrPSoVxmSFe > div > div > a:nth-child(4) > div > svg').click()
+
+
     print(page)
 
+data = data.drop_duplicates()
+
+os.chdir(r'/Users/hconner/AmphibianData')
 data.to_csv(name)
+
+#########################################
+# Types of Amphibians
+########################################
+
+# //*[@id="animals_by_tag"]/div[3]/div/div/div/h5/a
+# //*[@id="animals_by_tag"]/div[4]/div/div/div/h5/a
+
+

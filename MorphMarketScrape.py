@@ -16,8 +16,8 @@ name = f'data_{datetime.datetime.now().strftime("%H%M_%m%d%Y")}.csv'
 #errors to log where scrape failed
 errors = []
 # Create a new instance of the Firefox sdriver
-os.chdir(r'/Users/hconner/')
-driver = webdriver.Chrome()
+#os.chdir(r'/Users/hconner/')  # /Users/hconner/Downloads/chromedriver_mac64 (1) 2/chromedriver
+driver = webdriver.Chrome(executable_path='/Users/hconner/Downloads/chromedriver_mac64 (1) 2/chromedriver')
 
 # Navigate to the Craigslist homepage
 driver.get("https://www.morphmarket.com/")
@@ -38,22 +38,26 @@ numOfPages = re.findall(r'\d{1,5}', numOfPages) #re.findall(r'of',numOfPages)
 numOfP = int(numOfPages[1])
 #number of pages needed to loop through for all the links
 #numOfP = int(numOfLinks/int(numOfPages[1]))
-data = pd.DataFrame(columns=['AnimalType1', 'AnimalType2','Info' ,'About1', 'About2'])
+data = pd.DataFrame(columns=['AnimalType1', 'AnimalType2','Info' ,'About1', 'About2', 'Seller'])
 
 # Get relevant data gets all the data on the webpage for a particular amphibian
 
 def getRelevantData():
-    animal_type1 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[3]/div/div[1]/div[1]/h1').text
+                                                 #//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div/div[1]/div[1]/h1
+    animal_type1 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div/div[1]/div[1]/h1').text
     animal_type2 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[1]/div[2]/div/div[1]').text
-    animal_info = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[3]/div').text
+                                                #//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div
+    animal_info = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div').text
     animal_about1 = driver.find_element(By.XPATH,'//*[@id="snake-page"]/div/div/div/div[2]/div[1]').text
-    animal_about2 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div[3]/div[1]').text
-    return([animal_type1, animal_type2, animal_info, animal_about1, animal_about2])
+                                                  #//*[@id="snake-page"]/div/div/div/div[2]/div[1]/div[3]/div[1]
+    animal_about2 = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[1]/div[3]/div[1]').text
+    seller = driver.find_element(By.XPATH, '//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div/div[1]/div[6]').text
+    return([animal_type1, animal_type2, animal_info, animal_about1, animal_about2, seller])
 
 for page in range(0,numOfP):
     for i in range(1, 25):
-                # //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[2]/div[1]/picture/img
-        xpath = '//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[{}]/div[1]/picture/img'.format(i)
+                # //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[1]/div[2]/picture/img
+        xpath = '//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[{}]/div[2]/picture/img'.format(i)
         try:
             driver.find_element(By.XPATH, xpath).click()
             try:

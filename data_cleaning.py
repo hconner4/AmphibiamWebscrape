@@ -77,6 +77,7 @@ states = [
 # will need updating
 # seller data
 seller_data = pd.read_csv(r'/Users/hconner/AmphibianData/SellerData.csv')
+sellers = seller_data['CompanyName']
 type_of_amphibians = pd.read_csv(r'/Users/hconner/Downloads/amphibian_types.csv')
 frogs = type_of_amphibians['Frog'].values
 newts = type_of_amphibians[~type_of_amphibians['Newt'].isna()]['Newt'].values
@@ -101,6 +102,7 @@ for filename in os.listdir(dir_path):
             #print(date_object)
             #for checking if new data structure was used (after 5/16)
             append_name.split('.csv')[0]
+            # file_path = '/Users/hconner/AmphibianData2/data_0356_06092023.csv'
             with open(file_path, 'r') as csvfile:
                 reader = csv.reader(csvfile)
                 next(reader)
@@ -112,6 +114,7 @@ for filename in os.listdir(dir_path):
                     animal_age = 'None'
                     animal_state = 'None'
                     seller = 'None'
+                    animal_price = 'None'
 
                     #print(row)
                     # Sorting through data for relevant information
@@ -126,7 +129,18 @@ for filename in os.listdir(dir_path):
                     
                     # find the first instance of a dollar sign so split
                     index_of_price = [idx for idx, s in enumerate(data_as_string) if '$' in s][0] #gives index of price everything before this is type of amphibian
+                    #animal price
+                    animal_price_list = re.findall(r'\$\d+(?:\.\d+)?', data_as_string[index_of_price])
                     
+                    animal_price = re.findall(r'\d+(?:\.\d+)?', animal_price_list[0])[0]
+                    animal_price = float(animal_price)
+
+                    if animal_price == 'None':
+                        animal_price = 0.0
+
+                    
+                    if index_of_price <= 5:
+                        index_of_price = index_of_price + 4
                     # animal type should be everything before price
                     animal_type = data_as_string[0:index_of_price]
 
@@ -137,6 +151,7 @@ for filename in os.listdir(dir_path):
                             for amphibian in ['frog', 'salamander', 'toad', 'axolotl', 'newt']: # loop through list of amphibians
                                 if amphibian.upper() in word.upper(): #if match is found
                                     amphibian_type_1 = amphibian
+                                    break
                     
 
                     if amphibian_type_1 != 'None':
@@ -148,6 +163,7 @@ for filename in os.listdir(dir_path):
                             for sub_category in for_searching:
                                 if sub_category.upper() in string.upper():
                                     amphibian_type_2 = sub_category
+                                    break
                     else:
                         for amph_type in amphibian_dict:
                             for_searching = amphibian_dict[amph_type]
@@ -158,6 +174,7 @@ for filename in os.listdir(dir_path):
                                     if sub_category.upper() in string.upper():
                                         amphibian_type_2 = sub_category
                                         amphibian_type_1 = amph_type
+                                        break
 
                     #search animal type for animal age
                     #juvenile, baby, subadult, adult
@@ -169,18 +186,29 @@ for filename in os.listdir(dir_path):
                             for age in ages:
                                 if age.upper() == word.upper():
                                     animal_age = age
+                                    break
 
                     #animal price
-                    animal_price = re.findall(r'\d+(?:\.\d+)?', data_as_string[index_of_price])
+                    #animal_price = re.findall(r'\d+(?:\.\d+)?', data_as_string[index_of_price])
 
                     # find the animal location by matching from the list of states
                     for idx,string in enumerate(data_as_string):
                         for state in states:
                             if f" {state} " in f" {string} ":
-                                animal_state = data_as_string[idx]
+                                animal_state = state
                                 state_index = idx
+                                break
 
-                    seller = data_as_string[state_index -1]
+                    #seller = data_as_string[state_index -1]
+
+                    for idx, string in enumerate(data_as_string):
+                        for s in sellers:
+                            if f"{s}" in f"{string}":
+                                seller = s
+                                break
+
+                    if seller == 'None':
+                        seller = 'Unknown'
 
                     # if sub type is none make type
                     if amphibian_type_2 == 'None':
@@ -190,7 +218,7 @@ for filename in os.listdir(dir_path):
                     amphibian_subtype.append(amphibian_type_2)
                     animal_ages.append(''.join(animal_age))
                     animal_locations.append(''.join(animal_state))
-                    animal_prices.append(''.join(animal_price))
+                    animal_prices.append(animal_price)
                     animal_seller.append(seller)
                     animal_types.append(' '.join(animal_type))
                     filenames.append(filename)
@@ -212,7 +240,3 @@ amphibian_data = pd.DataFrame({
                 'animal_locations':animal_locations,
                 'animal_prices':animal_prices,
                 'animal_sellers':animal_seller})
-
-#current date for all data name
-
-amphibian_data.to_csv('amphbian_data_06202023.csv')

@@ -56,7 +56,7 @@ def getRelevantData():
 
 for page in range(0,numOfP):
     for i in range(1, 25):
-                # //*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[1]/div[2]/picture/img
+                
         xpath = '//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[1]/a[{}]/div[2]/picture/img'.format(i)
         try:
             driver.find_element(By.XPATH, xpath).click()
@@ -79,10 +79,82 @@ os.chdir(r'/Users/hconner/AmphibianData')
 data.to_csv(name)
 
 #########################################
+# Seller scrape
+########################################
+  
+# creating the date object of today's date
+name = f'data_{datetime.datetime.now().strftime("%H%M_%m%d%Y")}.csv'
+
+#errors to log where scrape failed
+errors = []
+# Create a new instance of the Firefox sdriver
+#os.chdir(r'/Users/hconner/')  # /Users/hconner/Downloads/chromedriver_mac64 (1) 2/chromedriver
+driver = webdriver.Chrome()
+
+# Navigate to the Craigslist homepage
+driver.get("https://www.morphmarket.com/us/stores/?category=amphs")
+
+
+#//*[@id="root"]/div[2]/div[2]/div/div[6]/div[3]/div/div[3]/div/div/div
+numOfPages = driver.find_element(By.XPATH, '//*[@id="root"]/div[2]/div[2]/div/div[5]/div[4]/div/div[3]/div[2]/div/div').text
+#numOfPages[:11]
+#grabbing all numbers
+numOfPages = re.findall(r'\d{1,5}', numOfPages) #re.findall(r'of',numOfPages)
+#not sure if it is safe to grab the highest or the 2 highest in the list
+#probably can grab the last 2 entries
+
+#number of links
+numOfP = int(numOfPages[1])
+#number of pages needed to loop through for all the links
+#numOfP = int(numOfLinks/int(numOfPages[1]))
+data = pd.DataFrame(columns=['CompanyName', 'CompanyData','BageInfo'])
+
+# Get relevant data gets all the data on the webpage for a particular amphibian
+
+def getRelevantData():
+                                                 #//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div/div[1]/div[1]/h1
+    company_name = driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div/div/div/div[2]/h1').text
+    company_data = driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div/div/div/div[3]/div[2]').text
+                                                #//*[@id="snake-page"]/div/div/div/div[2]/div[2]/div
+    badge_info = driver.find_element(By.XPATH, '//*[@id="badges-preview"]').text
+    
+    return([company_name, company_data, badge_info])
+
+for page in range(0,numOfP):
+    for i in range(1, 25):
+               
+        xpath = '//*[@id="root"]/div[2]/div[2]/div/div[5]/div[4]/div/div[1]/a[{}]/div[1]/picture/img'.format(i)
+        
+        try:
+            driver.find_element(By.XPATH, xpath).click()
+            try:
+                data.loc[len(data)] = getRelevantData()
+                driver.back()
+            except Exception as e:
+                errors.append(i)
+                driver.back()
+        except Exception as e:
+            errors.append(e)
+    # //*[@id="root"]/div[2]/div[2]/div/div[5]/div[4]/div/div[3]/div[2]/div/a[1]/div/svg/path
+    #root > div.PD8nHTdml1ZBT90vCA6l > div.F8dpc6zxp2_Y4GgkBu1K.mainWrapper > div > div.Jn45mH2ymlpTljoZ0ij8 > div.FaJQFzn53AhUPrx5FGZA > div > div.Ac9cgD8VuNGFRxtfonUP.xNNeyqRvM9HzLXCXXndj > div.CAyKOsZuOkQ2tghXPpvJ > div > a:nth-child(4) > div > svg > path
+    driver.find_element(By.CSS_SELECTOR, '#root > div.PD8nHTdml1ZBT90vCA6l > div.F8dpc6zxp2_Y4GgkBu1K.mainWrapper > div > div.Jn45mH2ymlpTljoZ0ij8 > div.FaJQFzn53AhUPrx5FGZA > div > div.Ac9cgD8VuNGFRxtfonUP.xNNeyqRvM9HzLXCXXndj > div.CAyKOsZuOkQ2tghXPpvJ > div > a:nth-child(4) > div > svg').click()
+
+
+    print(page)
+
+data = data.drop_duplicates()
+
+os.chdir(r'/Users/hconner/AmphibianData')
+data.to_csv('SellerData.csv')
+
+#########################################
 # Types of Amphibians
 ########################################
 
 # //*[@id="animals_by_tag"]/div[3]/div/div/div/h5/a
 # //*[@id="animals_by_tag"]/div[4]/div/div/div/h5/a
+
+
+
 
 
